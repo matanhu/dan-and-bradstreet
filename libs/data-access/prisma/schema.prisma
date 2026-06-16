@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  name          String
+  email         String        @unique
+  assignedTasks Task[]        @relation("AssignedUser")
+  taskHistories TaskHistory[]
+
+  @@map("users")
+}
+
+model Task {
+  id           Int           @id @default(autoincrement())
+  type         TaskType
+  status       Int           @default(1)
+  isClosed     Boolean       @default(false)
+  customFields Json          @default("{}")
+  assignedTo   Int
+  assignedUser User          @relation("AssignedUser", fields: [assignedTo], references: [id])
+  history      TaskHistory[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("tasks")
+}
+
+model TaskHistory {
+  id           Int      @id @default(autoincrement())
+  taskId       Int
+  task         Task     @relation(fields: [taskId], references: [id])
+  fromStatus   Int
+  toStatus     Int
+  assignedTo   Int
+  assignedUser User     @relation(fields: [assignedTo], references: [id])
+  customFields Json     @default("{}")
+  createdAt    DateTime @default(now())
+
+  @@map("task_history")
+}
+
+enum TaskType {
+  PROCUREMENT
+  DEVELOPMENT
+}

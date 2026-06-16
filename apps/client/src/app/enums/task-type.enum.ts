@@ -1,0 +1,4 @@
+export enum TaskType {
+  PROCUREMENT = 'PROCUREMENT',
+  DEVELOPMENT = 'DEVELOPMENT',
+}
